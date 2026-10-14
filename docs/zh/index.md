@@ -13,18 +13,10 @@ import QCHero from '../.vitepress/theme/components/QCHero.vue'
   :actions="[
     {
       theme: 'brand',
-      text: '10 分钟快速上手',
-      link: '/guide/getting-started'
-    },
-    {
-      theme: 'alt', 
-      text: '浏览 90+ 内置组件',
-      link: '/reference/components'
-    },
-    {
-      theme: 'alt', 
-      text: '查询 142 个中文函数',
-      link: '/reference/dsl-functions'
+      text: '加入QQ群【QCFlutterFlow_中文编程】',
+      link: 'https://qm.qq.com/q/ywiNks7JpQ',
+      target: '_blank',
+      rel: 'noopener noreferrer'
     }
   ]"
   image="/qc-logo.png"

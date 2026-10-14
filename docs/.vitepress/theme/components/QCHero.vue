@@ -20,7 +20,7 @@
                     <!-- 单个按钮容器 -->
                     <div v-for="action in actions" :key="action.link" class="action">
                         <!-- 按钮链接：根据主题应用不同样式 -->
-                        <a :href="withBase(action.link)" :class="['btn', `btn-${action.theme}`]" :target="action.target"
+                        <a :href="action.link.startsWith('http') ? action.link : withBase(action.link)" :class="['btn', `btn-${action.theme}`]" :target="action.target"
                             :rel="action.rel">
                             {{ action.text }}
                         </a>
@@ -69,13 +69,10 @@ defineProps({
         default: () => [
             {
                 theme: 'brand',
-                text: '什么是 VitePress?',
-                link: '/zh/guide/what-is-vitepress'
-            },
-            {
-                theme: 'alt',
-                text: '快速开始',
-                link: '/zh/guide/getting-started'
+                text: '加入QQ群【QCFlutterFlow_中文编程】',
+                link: 'https://qm.qq.com/q/ywiNks7JpQ',
+                target: '_blank',
+                rel: 'noopener noreferrer'
             }
         ]
     }
