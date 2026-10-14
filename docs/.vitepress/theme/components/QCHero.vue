@@ -19,10 +19,37 @@
                 <div class="actions">
                     <!-- 单个按钮容器 -->
                     <div v-for="action in actions" :key="action.link" class="action">
-                        <!-- 按钮链接：根据主题应用不同样式 -->
-                        <a :href="action.link.startsWith('http') ? action.link : withBase(action.link)" :class="['btn', `btn-${action.theme}`]" :target="action.target"
+                        <!-- 按钮链接：根据主题应用不同样式，支持鼠标悬停弹出群二维码、点击直接跳转 -->
+                        <a :href="action.link.startsWith('http') ? action.link : withBase(action.link)"
+                            :class="['btn', `btn-${action.theme}`, { 'has-qrcode': action.qrcode !== false }]"
+                            :target="action.target"
                             :rel="action.rel">
-                            {{ action.text }}
+                            <span class="btn-content">
+                                <svg class="qq-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                                    <path d="M12.003 2c-2.265 0-6.29 1.364-6.29 7.325v1.195S3.55 14.96 3.55 17.474c0 .665.17 1.025.281 1.025.114 0 .902-.484 1.748-2.072 0 0-.18 2.197 1.904 3.967 0 0-1.77.495-1.77 1.182 0 .686 4.078.43 6.29 0 2.239.425 6.287.687 6.287 0 0-.688-1.768-1.768-1.182 2.085-1.77 1.905-3.967 1.905-3.967.845 1.588 1.634 2.072 1.746 2.072.111 0 .283-.36.283-1.025 0-2.514-2.166-6.954-2.166-6.954V9.325C18.29 3.364 14.268 2 12.003 2z"/>
+                                </svg>
+                                <span>{{ action.text }}</span>
+                                <svg v-if="action.qrcode !== false" class="qr-badge-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                                    <path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 19h2M19 14v2"/>
+                                </svg>
+                            </span>
+
+                            <!-- 悬停展示群二维码弹层，点击同样直接跳转加群链接 -->
+                            <div v-if="action.qrcode !== false" class="qrcode-popover">
+                                <div class="qrcode-popover-arrow"></div>
+                                <div class="qrcode-card">
+                                    <div class="qrcode-img-wrapper">
+                                        <img :src="withBase(action.qrcode || '/qq-qrcode.jpg')" alt="QCFlutterFlow_中文编程 QQ群二维码" class="qrcode-img" />
+                                    </div>
+                                    <div class="qrcode-footer">
+                                        <span class="qrcode-footer-dot"></span>
+                                        <span>扫码入群 · 点击直接跳转</span>
+                                    </div>
+                                </div>
+                            </div>
                         </a>
                     </div>
                 </div>
@@ -71,6 +98,7 @@ defineProps({
                 theme: 'brand',
                 text: '加入QQ群【QCFlutterFlow_中文编程】',
                 link: 'https://qm.qq.com/q/ywiNks7JpQ',
+                qrcode: '/qq-qrcode.jpg',
                 target: '_blank',
                 rel: 'noopener noreferrer'
             }
@@ -192,63 +220,179 @@ defineProps({
     /* 最大宽度限制 */
 }
 
-/* =========================== 按钮样式 =========================== */
+/* =========================== 按钮与悬浮二维码样式 =========================== */
 /* actions: 按钮容器，使用弹性布局 */
 .actions {
     display: flex;
-    /* 弹性布局 */
     gap: 16px;
-    /* 按钮间距 */
     justify-content: flex-start;
-    /* 按钮左对齐 */
     flex-wrap: wrap;
-    /* 允许换行 */
+}
+
+.action {
+    position: relative;
 }
 
 /* btn: 按钮基础样式 */
 .btn {
-    display: inline-block;
-    /* 行内块显示 */
-    padding: 12px 24px;
-    /* 内边距 */
-    border-radius: 8px;
-    /* 圆角 */
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 13px 26px;
+    border-radius: 12px;
     text-decoration: none;
-    /* 移除下划线 */
     font-weight: 600;
-    /* 字体粗细 */
-    transition: all 0.3s ease;
-    /* 过渡动画 */
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.qq-icon {
+    flex-shrink: 0;
+}
+
+.qr-badge-icon {
+    flex-shrink: 0;
+    opacity: 0.85;
+    transition: transform 0.28s ease, opacity 0.28s ease;
 }
 
 /* btn-brand: 品牌主题按钮（主要按钮） */
 .btn-brand {
     background-color: var(--vp-c-brand-1);
-    /* 品牌色背景 */
     color: var(--vp-c-white);
-    /* 白色文字 */
+    box-shadow: 0 6px 20px -4px rgba(100, 108, 255, 0.45);
 }
 
 /* btn-brand:hover: 品牌按钮悬停效果 */
 .btn-brand:hover {
     background-color: var(--vp-c-brand-2);
-    /* 悬停时的品牌色 */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px -4px rgba(100, 108, 255, 0.6);
+}
+
+.btn:hover .qr-badge-icon {
+    opacity: 1;
+    transform: scale(1.12);
 }
 
 /* btn-alt: 次要主题按钮（辅助按钮） */
 .btn-alt {
     background-color: var(--vp-c-bg-alt);
-    /* 次要背景色 */
     color: var(--vp-c-text-1);
-    /* 主要文本色 */
     border: 1px solid var(--vp-c-divider);
-    /* 边框 */
 }
 
 /* btn-alt:hover: 次要按钮悬停效果 */
 .btn-alt:hover {
     background-color: var(--vp-c-gray-light-4);
-    /* 悬停背景色 */
+}
+
+/* =========================== 悬浮二维码气泡卡片 =========================== */
+.qrcode-popover {
+    position: absolute;
+    top: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px) scale(0.94);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.26s;
+    z-index: 100;
+}
+
+/* 透明桥接层：保证鼠标从按钮移向二维码卡片时悬停状态不中断 */
+.qrcode-popover::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+}
+
+.btn:hover .qrcode-popover,
+.btn:focus-visible .qrcode-popover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* 顶部指示小三角 */
+.qrcode-popover-arrow {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background: #18181b;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    transform: translateX(-50%) rotate(45deg);
+    z-index: 1;
+}
+
+/* 二维码主体卡片 */
+.qrcode-card {
+    position: relative;
+    width: 236px;
+    padding: 10px 10px 8px;
+    background: #18181b;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
+                0 0 28px rgba(100, 108, 255, 0.28);
+    overflow: hidden;
+}
+
+.qrcode-img-wrapper {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #141414;
+}
+
+.qrcode-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* 裁掉手机截图上下多余纯黑留白，完整保留群名、群号、二维码与扫码提示 */
+    margin-top: -20%;
+    margin-bottom: -16%;
+    transition: transform 0.3s ease;
+}
+
+.qrcode-card:hover .qrcode-img {
+    transform: scale(1.02);
+}
+
+.qrcode-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.3px;
+}
+
+.qrcode-footer-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #38bdf8;
+    box-shadow: 0 0 8px #38bdf8;
 }
 
 /* =========================== 图片样式 =========================== */

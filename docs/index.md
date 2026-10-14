@@ -15,6 +15,7 @@ import QCHero from './.vitepress/theme/components/QCHero.vue'
       theme: 'brand',
       text: '加入QQ群【QCFlutterFlow_中文编程】',
       link: 'https://qm.qq.com/q/ywiNks7JpQ',
+      qrcode: '/qq-qrcode.jpg',
       target: '_blank',
       rel: 'noopener noreferrer'
     }
