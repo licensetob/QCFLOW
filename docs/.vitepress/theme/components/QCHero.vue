@@ -18,12 +18,17 @@
                 <!-- 操作按钮区域：包含所有的行动按钮 -->
                 <div class="actions">
                     <!-- 单个按钮容器 -->
-                    <div v-for="action in actions" :key="action.link" class="action">
-                        <!-- 按钮链接：根据主题应用不同样式，支持鼠标悬停弹出群二维码、点击直接跳转 -->
-                        <a :href="action.link.startsWith('http') ? action.link : withBase(action.link)"
+                    <div v-for="(action, idx) in actions" :key="action.link" class="action">
+                        <!-- 按钮链接：根据主题应用不同样式，支持鼠标悬停自动判断方向弹出群二维码、点击直接跳转 -->
+                        <a
+                            :ref="el => setBtnRef(el, idx)"
+                            :href="action.link.startsWith('http') ? action.link : withBase(action.link)"
                             :class="['btn', `btn-${action.theme}`, { 'has-qrcode': action.qrcode !== false }]"
                             :target="action.target"
-                            :rel="action.rel">
+                            :rel="action.rel"
+                            @mouseenter="updatePlacement(idx)"
+                            @focus="updatePlacement(idx)"
+                        >
                             <span class="btn-content">
                                 <svg class="qq-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
                                     <path d="M12.003 2c-2.265 0-6.29 1.364-6.29 7.325v1.195S3.55 14.96 3.55 17.474c0 .665.17 1.025.281 1.025.114 0 .902-.484 1.748-2.072 0 0-.18 2.197 1.904 3.967 0 0-1.77.495-1.77 1.182 0 .686 4.078.43 6.29 0 2.239.425 6.287.687 6.287 0 0-.688-1.768-1.768-1.182 2.085-1.77 1.905-3.967 1.905-3.967.845 1.588 1.634 2.072 1.746 2.072.111 0 .283-.36.283-1.025 0-2.514-2.166-6.954-2.166-6.954V9.325C18.29 3.364 14.268 2 12.003 2z"/>
@@ -37,8 +42,12 @@
                                 </svg>
                             </span>
 
-                            <!-- 悬停展示群二维码弹层，点击同样直接跳转加群链接 -->
-                            <div v-if="action.qrcode !== false" class="qrcode-popover">
+                            <!-- 悬停展示群二维码弹层（自动根据屏幕剩余空间选择上/下/右侧弹出），点击同样直接跳转加群链接 -->
+                            <div
+                                v-if="action.qrcode !== false"
+                                :class="['qrcode-popover', `is-${placements[idx] || 'top'}`]"
+                                :style="{ '--popover-shift-y': `${shiftYs[idx] || 0}px` }"
+                            >
                                 <div class="qrcode-popover-arrow"></div>
                                 <div class="qrcode-card">
                                     <div class="qrcode-img-wrapper">
@@ -68,10 +77,11 @@
 </template>
 
 <script setup>
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { withBase } from 'vitepress'
 import CircleFogAnimation from './CircleFogAnimation.vue'
 
-defineProps({
+const props = defineProps({
     name: {
         type: String,
         default: 'QC Flutter Flow'
@@ -105,6 +115,76 @@ defineProps({
         ]
     }
 })
+
+const btnRefs = ref([])
+const placements = reactive({})
+const shiftYs = reactive({})
+
+function setBtnRef(el, idx) {
+    if (el) {
+        btnRefs.value[idx] = el
+    }
+}
+
+/**
+ * 自动计算二维码气泡最佳弹出方向（下 / 上 / 右），防止超出视口被遮挡
+ */
+function updatePlacement(idx = 0) {
+    if (typeof window === 'undefined') return
+    const el = btnRefs.value[idx]
+    if (!el) return
+
+    const rect = el.getBoundingClientRect()
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+
+    const CARD_H = 325 // 二维码气泡高度预估
+    const CARD_W = 240 // 二维码气泡宽度预估
+    const GAP = 16
+    const NAV_H = 68   // 顶部导航栏安全高度
+    const EDGE = 16    // 视口边缘安全间距
+
+    const spaceBottom = vh - rect.bottom - EDGE
+    const spaceTop = rect.top - NAV_H - EDGE
+    const spaceRight = vw - rect.right - EDGE
+
+    shiftYs[idx] = 0
+
+    if (spaceBottom >= CARD_H + GAP) {
+        placements[idx] = 'bottom'
+    } else if (spaceTop >= CARD_H + GAP) {
+        placements[idx] = 'top'
+    } else if (spaceRight >= CARD_W + GAP && vw >= 640) {
+        placements[idx] = 'right'
+        // 计算右侧居中时上下是否越界，自动修正垂直偏移量
+        const centerY = rect.top + rect.height / 2
+        const halfH = CARD_H / 2
+        if (centerY - halfH < NAV_H + EDGE) {
+            shiftYs[idx] = (NAV_H + EDGE) - (centerY - halfH)
+        } else if (centerY + halfH > vh - EDGE) {
+            shiftYs[idx] = (vh - EDGE) - (centerY + halfH)
+        }
+    } else {
+        placements[idx] = spaceTop >= spaceBottom ? 'top' : 'bottom'
+    }
+}
+
+function updateAllPlacements() {
+    props.actions.forEach((_, idx) => updatePlacement(idx))
+}
+
+onMounted(() => {
+    updateAllPlacements()
+    window.addEventListener('resize', updateAllPlacements, { passive: true })
+    window.addEventListener('scroll', updateAllPlacements, { passive: true })
+})
+
+onBeforeUnmount(() => {
+    if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', updateAllPlacements)
+        window.removeEventListener('scroll', updateAllPlacements)
+    }
+})
 </script>
 
 <style scoped>
@@ -122,7 +202,7 @@ defineProps({
     /* 移除左右内边距，让内容可以紧贴边缘 */
     text-align: center;
     /* 文本居中对齐 */
-    height: 100vh;
+    min-height: calc(100vh - 64px);
     /* 设置为视窗全高 */
     display: flex;
     /* 使用弹性布局 */
@@ -292,23 +372,25 @@ defineProps({
     background-color: var(--vp-c-gray-light-4);
 }
 
-/* =========================== 悬浮二维码气泡卡片 =========================== */
+/* =========================== 悬浮二维码气泡卡片（自适应方向） =========================== */
 .qrcode-popover {
     position: absolute;
-    top: calc(100% + 14px);
-    left: 50%;
-    transform: translateX(-50%) translateY(10px) scale(0.94);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
                 visibility 0.26s;
-    z-index: 100;
+    z-index: 200;
 }
 
-/* 透明桥接层：保证鼠标从按钮移向二维码卡片时悬停状态不中断 */
-.qrcode-popover::before {
+/* 1. 下方弹出 (is-bottom) */
+.qrcode-popover.is-bottom {
+    top: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px) scale(0.94);
+}
+.qrcode-popover.is-bottom::before {
     content: '';
     position: absolute;
     top: -16px;
@@ -316,26 +398,85 @@ defineProps({
     right: 0;
     height: 16px;
 }
-
-.btn:hover .qrcode-popover,
-.btn:focus-visible .qrcode-popover {
+.btn:hover .qrcode-popover.is-bottom,
+.btn:focus-visible .qrcode-popover.is-bottom {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
     transform: translateX(-50%) translateY(0) scale(1);
 }
-
-/* 顶部指示小三角 */
-.qrcode-popover-arrow {
-    position: absolute;
+.qrcode-popover.is-bottom .qrcode-popover-arrow {
     top: -6px;
     left: 50%;
-    width: 12px;
-    height: 12px;
-    background: #18181b;
     border-top: 1px solid rgba(255, 255, 255, 0.16);
     border-left: 1px solid rgba(255, 255, 255, 0.16);
     transform: translateX(-50%) rotate(45deg);
+}
+
+/* 2. 上方弹出 (is-top) */
+.qrcode-popover.is-top {
+    bottom: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px) scale(0.94);
+}
+.qrcode-popover.is-top::before {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+}
+.btn:hover .qrcode-popover.is-top,
+.btn:focus-visible .qrcode-popover.is-top {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+.qrcode-popover.is-top .qrcode-popover-arrow {
+    bottom: -6px;
+    left: 50%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    border-right: 1px solid rgba(255, 255, 255, 0.16);
+    transform: translateX(-50%) rotate(45deg);
+}
+
+/* 3. 右侧弹出 (is-right) */
+.qrcode-popover.is-right {
+    left: calc(100% + 16px);
+    top: 50%;
+    transform: translateX(10px) translateY(calc(-50% + var(--popover-shift-y, 0px))) scale(0.94);
+}
+.qrcode-popover.is-right::before {
+    content: '';
+    position: absolute;
+    left: -18px;
+    top: 0;
+    bottom: 0;
+    width: 18px;
+}
+.btn:hover .qrcode-popover.is-right,
+.btn:focus-visible .qrcode-popover.is-right {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0) translateY(calc(-50% + var(--popover-shift-y, 0px))) scale(1);
+}
+.qrcode-popover.is-right .qrcode-popover-arrow {
+    left: -6px;
+    top: calc(50% - var(--popover-shift-y, 0px));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    transform: translateY(-50%) rotate(45deg);
+}
+
+/* 指示小三角公共样式 */
+.qrcode-popover-arrow {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #18181b;
     z-index: 1;
 }
 
