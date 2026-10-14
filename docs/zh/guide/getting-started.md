@@ -1,203 +1,123 @@
-# 快速开始 {#getting-started}
+# 10 分钟做出第一个应用
 
-## 在线尝试 {#try-it-online}
+本教程将带你从零开始，在 **10 分钟内**使用 QC Flutter Flow 搭建一个包含**「输入框、按钮、列表展示与弹窗提示」**的待办清单小应用，并在本地实时运行预览。
 
-可以直接在 [StackBlitz](https://vitepress.new) 上进行在线尝试。
+---
 
-## 安装 {#installation}
+## 第一步：一键自检开发环境（首次使用）
 
-### 前置准备 {#prerequisites}
+如果你是第一次打开软件，无需手动去网上下载配置 Flutter 或 Java 环境：
 
-- [Node.js](https://nodejs.org/) 18 及以上版本。
-- 通过命令行界面 (CLI) 访问 VitePress 的终端。
-- 支持 [Markdown](https://en.wikipedia.org/wiki/Markdown) 语法的编辑器。
-  - 推荐 [VSCode](https://code.visualstudio.com/) 及其[官方 Vue 扩展](https://marketplace.visualstudio.com/items?itemName=Vue.volar)。
+1. 在主界面左侧点击 **「环境管理」**。
+2. 点击右上角的 **「环境自检」**，系统会自动检测当前电脑的 **Flutter SDK、OpenJDK、Android 工具链与 Git** 状态，并自动对国内镜像源（阿里云、腾讯云、清华源等）进行测速。
+3. 如果某项环境显示未安装，直接点击对应的 **「一键安装」** 按钮，平台会在沙盒目录内自动下载并配置好全套便携式环境。
 
-VitePress 可以单独使用，也可以安装到现有项目中。在这两种情况下，都可以使用以下方式安装它：
+---
 
-::: code-group
+## 第二步：新建项目与认识默认首页
 
-```sh [npm]
-$ npm add -D vitepress
-```
+1. 切换到左侧 **「项目管理」**，点击右上角 **「+ 新建项目」**。
+2. 输入项目名称（例如：`我的待办清单`），选择 **「空白项目」**，点击确认创建。
+3. 进入画布编辑器后，打开左侧 **「页面」** 面板，你会看到系统已经默认为你创建好了：
+   - **`group_startup`（默认启动组）**
+   - **`page_main`（主页）**：应用启动后默认展示的第一个页面。
 
-```sh [pnpm]
-$ pnpm add -D vitepress
-```
+---
 
-```sh [yarn]
-$ yarn add -D vitepress
-```
+## 第三步：拖拽组件搭建界面
 
-```sh [yarn (pnp)]
-$ yarn add -D vitepress vue
-```
+我们要在主页上放一个**顶部导航栏**、一个**文本输入框**、一个**添加按钮**和一个**列表视图**：
 
-```sh [bun]
-$ bun add -D vitepress
-```
+1. 点击左侧面板切换到 **「组件物料库」**。
+2. **确认页面骨架**：画布默认包含一个 `页面脚手架 (Scaffold)`，它分为 `appBar`（顶部栏）、`body`（主体内容区）、`bottomNavigationBar`（底部栏）和 `floatingActionButton`（悬浮按钮）等插槽。
+3. **添加顶部导航栏**：
+   - 在物料库「导航组件」中找到 **「顶部导航栏 (AppBar)」**，将它拖入画布顶部的 `appBar` 区域。
+   - 在右侧属性面板的「内容」栏中，将**标题文字**改为 `我的待办清单`。
+4. **添加主体布局与输入区**：
+   - 在物料库「布局组件」中找到 **「纵向容器 (Column)」**，拖入画布中间的 `body` 区域。
+   - 在「表单组件」中找到 **「文本输入框 (TextField)」**，拖入刚才的纵向容器中。在右侧属性面板将组件 ID 记为（或改为）`inputTodo`，将**提示文本 (placeholder)** 改为 `请输入待办事项...`。
+   - 在「操作组件」中找到 **「按钮 (Button)」**，拖到输入框下方。在右侧属性面板将按钮文字改为 `添加事项`，背景色选择主题色 `primary`。
+5. **添加待办列表**：
+   - 在「数据组件」中找到 **「列表视图 (ListView)」**，拖到按钮下方。
+   - 往这个列表视图内部拖入一个 **「卡片 (Card)」**，再往卡片里拖入一个 **「文本 (Text)」** 组件，用于显示每一条待办内容。
 
-:::
+---
 
-::: tip 注意
+## 第四步：定义页面变量并绑定到列表
 
-VitePress 是仅 ESM 的软件包。不要使用 `require()` 导入它，并确保最新的 `package.json` 包含 `"type": "module"`，或者更改相关文件的文件扩展名，例如 `.vitepress/config.js` 到 `.mjs`/`.mts`。更多详情请参考 [Vite 故障排除指南](http://vitejs.dev/guide/troubleshooting.html#this-package-is-esm-only)。此外，在异步 CJS 上下文中，可以使用 `await import('vitepress')` 代替。
+为了让列表能够动态显示我们添加的事项，我们需要定义一个页面变量：
 
-:::
+1. 点击展开底部的 **「逻辑编排（DSL 代码编辑器）」** 面板。
+2. 在代码编辑区最上方定义一个列表变量 `待办列表` 和一个页面加载初始化函数：
 
-### 安装向导 {#setup-wizard}
+```dart
+// 定义页面响应式状态变量
+变量 待办列表 = [
+  {"标题": "体验 QC Flutter Flow 画布拖拽"},
+  {"标题": "编写第一段中文交互逻辑"}
+]
 
-VitePress 附带一个命令行设置向导，可以帮助你构建一个基本项目。安装后，通过运行以下命令启动向导：
-
-::: code-group
-
-```sh [npm]
-$ npx vitepress init
-```
-
-```sh [pnpm]
-$ pnpm vitepress init
-```
-
-```sh [yarn]
-$ yarn vitepress init
-```
-
-```sh [bun]
-$ bun vitepress init
-```
-
-:::
-
-将需要回答几个简单的问题：
-
-<<< @/snippets/init.ansi
-
-:::tip Vue 作为 peer dependency
-如果打算使用 Vue 组件或 API 进行自定义，还应该明确地将 `vue` 安装为 dependency。
-:::
-
-## 文件结构 {#file-structure}
-
-如果正在构建一个独立的 VitePress 站点，可以在当前目录 (`./`) 中搭建站点。但是，如果在现有项目中与其他源代码一起安装 VitePress，建议将站点搭建在嵌套目录 (例如 `./docs`) 中，以便它与项目的其余部分分开。
-
-假设选择在 `./docs` 中搭建 VitePress 项目，生成的文件结构应该是这样的：
-
-```
-.
-├─ docs
-│  ├─ .vitepress
-│  │  └─ config.js
-│  ├─ api-examples.md
-│  ├─ markdown-examples.md
-│  └─ index.md
-└─ package.json
-```
-
- `docs` 目录作为 VitePress 站点的项目**根目录**。`.vitepress` 目录是 VitePress 配置文件、开发服务器缓存、构建输出和可选主题自定义代码的位置。
-
-:::tip
-默认情况下，VitePress 将其开发服务器缓存存储在 `.vitepress/cache` 中，并将生产构建输出存储在 `.vitepress/dist` 中。如果使用 Git，应该将它们添加到 `.gitignore` 文件中。也可以手动[配置](../reference/site-config#outdir)这些位置。
-:::
-
-### 配置文件 {#the-config-file}
-
-配置文件 (`.vitepress/config.js`) 让你能够自定义 VitePress 站点的各个方面，最基本的选项是站点的标题和描述：
-
-```js [.vitepress/config.js]
-export default {
-  // 站点级选项
-  title: 'VitePress',
-  description: 'Just playing around.',
-
-  themeConfig: {
-    // 主题级选项
-  }
+// 页面进入时自动执行
+函数 页面加载完成() {
+  系统_弹出提示("欢迎使用待办清单！")
 }
 ```
 
-还可以通过 `themeConfig` 选项配置主题的行为。有关所有配置选项的完整详细信息，请参见[配置参考](../reference/site-config)。
+3. **将变量绑定到画布列表**：
+   - 在画布中点击选中 **「列表视图 (ListView)」**，在右侧属性面板的 **「数据源 (dataSource)」** 中填入 `{{待办列表}}`。
+   - 点击选中列表卡片内部的 **「文本 (Text)」** 组件，在右侧「内容」面板将文本内容设置为：
+     ```text
+     {{item.标题}}
+     ```
+   - 此时画布上会立即预览展示出待办事项！
 
-### 源文件 {#source-files}
+---
 
-`.vitepress` 目录之外的 Markdown 文件被视为**源文件**。
+## 第五步：给「添加事项」按钮编写点击事件
 
-VitePress 使用 **基于文件的路由**：每个 `.md` 文件将在相同的路径被编译成为 `.html` 文件。例如，`index.md` 将会被编译成 `index.html`，可以在生成的 VitePress 站点的根路径 `/` 进行访问。
+接下来，我们实现点击按钮时将输入框里的文字加入到列表中：
 
-VitePress 还提供了生成简洁 URL、重写路径和动态生成页面的能力。这些将在[路由指南](./routing)中进行介绍。
+1. 在画布上单击选中 **「添加事项」按钮**。
+2. 在右侧属性面板切换到 **「事件 (Events)」** 象限，找到 **「点击事件 (onTap)」**，点击右侧的 **「编辑代码」**。
+3. 在底部弹出的事件函数中写入以下中文逻辑（输入时按 `Tab` 或 `Enter` 可直接使用智能补全）：
 
-## 启动并运行 {#up-and-running}
+```dart
+// 获取输入框当前的文字
+变量 输入内容 = inputTodo.text
 
-该工具还应该将以下 npm 脚本注入到 `package.json` 中：
-
-```json [package.json]
-{
-  ...
-  "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
-  },
-  ...
+// 校验输入是否为空
+如果 (文本_是否为空(输入内容)) {
+  系统_弹出错误提示("请先输入待办内容！")
+  返回
 }
+
+// 往待办列表中添加新事项
+数组_添加(待办列表, {"标题": 输入内容})
+
+// 清空输入框并弹出成功提示
+inputTodo.setText("")
+系统_弹出成功提示("添加成功！")
 ```
 
-`docs:dev` 脚本将启动具有即时热更新的本地开发服务器。使用以下命令运行它：
+4. 按快捷键 `Ctrl + S`（macOS 为 `Cmd + S`）保存代码，编辑器会自动将事件同步回画布按钮。
 
-::: code-group
+---
 
-```sh [npm]
-$ npm run docs:dev
-```
+## 第六步：一键运行与实时热重载
 
-```sh [pnpm]
-$ pnpm run docs:dev
-```
+1. 在顶部工具栏右侧的设备下拉框中，选择你要运行的目标设备（例如：**Windows / macOS 桌面端**、已启动的 **Android 模拟器**或连接的手机真机）。
+2. 点击绿色的 **「▶ 运行 (Run)」** 按钮。
+3. 底部会自动展开 **「运行日志」** 面板：
+   - 平台会自动在后台生成标准 Flutter 工程代码、执行离线依赖解析（`pub get --offline`）并启动应用窗口。
+4. **体验秒级热重载**：
+   - 当应用窗口运行起来后，试着在画布中把按钮颜色改成绿色（`success`），然后点击顶部工具栏的 **「⚡ 热重载 (Hot Reload)」** 按钮，无需重新编译，运行中的应用界面会在 1 秒内即时更新！
 
-```sh [yarn]
-$ yarn docs:dev
-```
+---
 
-```sh [bun]
-$ bun run docs:dev
-```
+## 恭喜完成！
 
-:::
+你已经掌握了 QC Flutter Flow 最核心的 **「拖拽组件 -> 绑定变量 -> 中文事件编排 -> 一键运行」** 完整流程。接下来你可以深入学习：
 
-除了 npm 脚本，还可以直接调用 VitePress：
-
-::: code-group
-
-```sh [npm]
-$ npx vitepress dev docs
-```
-
-```sh [pnpm]
-$ pnpm vitepress dev docs
-```
-
-```sh [yarn]
-$ yarn vitepress dev docs
-```
-
-```sh [bun]
-$ bun vitepress dev docs
-```
-
-:::
-
-更多的命令行用法请参见 [CLI 参考](../reference/cli)。
-
-开发服务应该会运行在 `http://localhost:5173` 上。在浏览器中访问 URL 以查看新站点的运行情况吧！
-
-## 下一步 {#what-s-next}
-
-- 想要进一步了解 Markdown 文件是怎么映射到对应的 HTML，请继续阅读[路由指南](./routing)。
-
-- 要了解有关可以在页面上执行的操作的更多信息，例如编写 Markdown 内容或使用 Vue 组件，请参见指南的“编写”部分。一个很好的起点是了解 [Markdown 扩展](./markdown)。
-
-- 要探索默认文档主题提供的功能，请查看[默认主题配置参考](../reference/default-theme-config)。
-
-- 如果想进一步自定义站点的外观，参见[扩展默认主题](./extending-default-theme)或者[构建自定义主题](./custom-theme)。
-
-- 文档成形以后，务必阅读[部署指南](./deploy)。
+- **[可视化画布与页面管理](./canvas-and-pages)**：掌握多页面跳转、局部复用组件与多端响应式断点设计。
+- **[中文逻辑编排（DSL 教程）](./dsl-logic)**：全面了解变量、`#` 语法糖与流程控制写法。
+- **[AI 智能助手与全栈生成](./ai-assistant)**：试试用一句话让 AI 直接帮你生成带后端接口的完整应用！

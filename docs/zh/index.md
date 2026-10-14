@@ -6,21 +6,25 @@ layout: home
 import QCHero from '../.vitepress/theme/components/QCHero.vue'
 </script>
 
-<!-- 使用自定义 QCHero 组件替代默认 hero 配置 -->
 <QCHero 
   name="QC Flutter Flow"
-  text="让Flutter开发变得简单"
-  tagline="只需几分钟，构建精美的Flutter应用"
+  text="让多端应用开发变得简单"
+  tagline="可视化拖拽画布 · 142 个中文函数逻辑编排 · AI 对话一键生成全栈应用"
   :actions="[
     {
       theme: 'brand',
-      text: '什么是 VitePress?',
-      link: '/zh/guide/what-is-vitepress'
+      text: '10 分钟快速上手',
+      link: '/guide/getting-started'
     },
     {
       theme: 'alt', 
-      text: '快速开始',
-      link: '/zh/guide/getting-started'
+      text: '浏览 90+ 内置组件',
+      link: '/reference/components'
+    },
+    {
+      theme: 'alt', 
+      text: '查询 142 个中文函数',
+      link: '/reference/dsl-functions'
     }
   ]"
   image="/qc-logo.png"
