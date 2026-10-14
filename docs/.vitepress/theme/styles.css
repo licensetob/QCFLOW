@@ -1,0 +1,306 @@
+:root:where(:lang(fa)) {
+  --vp-font-family-base:
+    'Vazirmatn', 'Inter', ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(
+    120deg,
+    #2EDF04 30%,
+    #4CAF50
+  );
+  
+  /* 品牌主题色 */
+  --vp-c-brand-1: #2EDF04;
+  --vp-c-brand-2: #4CAF50;
+  --vp-c-brand-3: #45a049;
+}
+
+
+
+/* 迷雾动画效果 - 快速明显的动态雾气 */
+@keyframes mistFloat {
+  0% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+  10% {
+    transform: translate(-25px, -30px) rotate(5deg) scale(1.15);
+  }
+  20% {
+    transform: translate(20px, -15px) rotate(-3deg) scale(0.85);
+  }
+  30% {
+    transform: translate(-18px, 25px) rotate(4deg) scale(1.08);
+  }
+  40% {
+    transform: translate(30px, -8px) rotate(-2deg) scale(0.92);
+  }
+  50% {
+    transform: translate(-12px, 18px) rotate(6deg) scale(1.12);
+  }
+  60% {
+    transform: translate(22px, -22px) rotate(-4deg) scale(0.88);
+  }
+  70% {
+    transform: translate(-28px, 12px) rotate(3deg) scale(1.05);
+  }
+  80% {
+    transform: translate(15px, -18px) rotate(-5deg) scale(0.95);
+  }
+  90% {
+    transform: translate(-8px, 20px) rotate(2deg) scale(1.03);
+  }
+  100% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes mistPulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1.2) rotate(3deg);
+  }
+  30% {
+    opacity: 0.4;
+    transform: scale(0.8) rotate(-2deg);
+  }
+  45% {
+    opacity: 0.9;
+    transform: scale(1.15) rotate(4deg);
+  }
+  60% {
+    opacity: 0.3;
+    transform: scale(0.75) rotate(-3deg);
+  }
+  75% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(2deg);
+  }
+  90% {
+    opacity: 0.6;
+    transform: scale(0.9) rotate(-1deg);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes mistWave {
+  0% {
+    border-radius: 80% 20% 90% 10%;
+    clip-path: ellipse(100% 100% at 50% 50%);
+  }
+  10% {
+    border-radius: 10% 90% 20% 80%;
+    clip-path: ellipse(120% 80% at 30% 70%);
+  }
+  20% {
+    border-radius: 90% 10% 80% 20%;
+    clip-path: ellipse(80% 120% at 70% 30%);
+  }
+  30% {
+    border-radius: 20% 80% 10% 90%;
+    clip-path: ellipse(110% 90% at 60% 40%);
+  }
+  40% {
+    border-radius: 85% 15% 75% 25%;
+    clip-path: ellipse(90% 110% at 40% 60%);
+  }
+  50% {
+    border-radius: 15% 85% 25% 75%;
+    clip-path: ellipse(130% 70% at 20% 80%);
+  }
+  60% {
+    border-radius: 75% 25% 85% 15%;
+    clip-path: ellipse(70% 130% at 80% 20%);
+  }
+  70% {
+    border-radius: 25% 75% 15% 85%;
+    clip-path: ellipse(100% 100% at 50% 50%);
+  }
+  80% {
+    border-radius: 95% 5% 70% 30%;
+    clip-path: ellipse(85% 115% at 65% 35%);
+  }
+  90% {
+    border-radius: 5% 95% 30% 70%;
+    clip-path: ellipse(115% 85% at 35% 65%);
+  }
+  100% {
+    border-radius: 80% 20% 90% 10%;
+    clip-path: ellipse(100% 100% at 50% 50%);
+  }
+}
+
+@keyframes mistSpin {
+  0% {
+    transform: rotate(0deg) skew(0deg, 0deg);
+  }
+  25% {
+    transform: rotate(90deg) skew(5deg, -2deg);
+  }
+  50% {
+    transform: rotate(180deg) skew(-3deg, 4deg);
+  }
+  75% {
+    transform: rotate(270deg) skew(2deg, -5deg);
+  }
+  100% {
+    transform: rotate(360deg) skew(0deg, 0deg);
+  }
+}
+
+/* 重置VPImage容器样式，保持原有布局 */
+.VPHero .VPImage {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 32px;
+}
+
+/* 移除迷雾动画效果 */
+.VPHero .VPImage .image-bg {
+  transform-origin: center;
+  overflow: hidden;
+}
+
+/* 确保image-src正确显示和居中 */
+.VPHero .VPImage img {
+  display: block;
+  margin: 0 auto;
+  max-width: 192px;
+  max-height: 192px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (min-width: 640px) {
+  .VPHero .VPImage img {
+    max-width: 256px;
+    max-height: 256px;
+  }
+}
+
+@media (min-width: 960px) {
+  .VPHero .VPImage img {
+    max-width: 320px;
+    max-height: 320px;
+  }
+}
+
+/* 修复布局 - 完全垂直居中方案 */
+.VPHero {
+  padding: 0;
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.VPHero .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+}
+
+.VPHero .main {
+  display: block;
+  text-align: center;
+  order: 1;
+}
+
+.VPHero .image {
+  order: 2;
+}
+
+.VPHero .name,
+.VPHero .text,
+.VPHero .tagline {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.VPHero .name {
+  margin-bottom: 16px;
+}
+
+.VPHero .text {
+  margin-bottom: 24px;
+}
+
+.VPHero .tagline {
+  margin-bottom: 32px;
+}
+
+/* 响应式调整 - 大屏幕水平布局 */
+@media (min-width: 960px) {
+  .VPHero.has-image .container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+    padding: 0 64px;
+  }
+  
+  .VPHero.has-image .main {
+    flex: 0 0 auto;
+    text-align: left;
+    max-width: 600px;
+    order: 1;
+  }
+  
+  .VPHero.has-image .image {
+    flex: 0 0 auto;
+    order: 2;
+  }
+  
+  .VPHero.has-image .name,
+  .VPHero.has-image .text,
+  .VPHero.has-image .tagline {
+    text-align: left;
+    margin: 0;
+  }
+  
+  .VPHero.has-image .VPImage {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+/* 导航栏logo和标题间距调整 */
+.VPNavBarTitle .title {
+  margin-left: 12px;
+}
+
+.VPNavBar .title {
+  margin-left: 12px;
+}
+
+/* 导航栏整体布局优化 */
+.VPNavBarTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* used in reference/default-theme-search */
+img[src='/search.png'] {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
