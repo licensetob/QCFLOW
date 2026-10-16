@@ -1,28 +1,21 @@
-# VitePress 📝💨
+# QC Flutter Flow
 
-[![test](https://github.com/vuejs/vitepress/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/vuejs/vitepress/actions/workflows/test.yml)
-[![npm](https://img.shields.io/npm/v/vitepress/next)](https://www.npmjs.com/package/vitepress/v/next)
-[![nightly releases](https://img.shields.io/badge/nightly-releases-orange)](https://nightly.akryum.dev/vuejs/vitepress)
-[![chat](https://img.shields.io/badge/chat-discord-blue?logo=discord)](https://chat.vuejs.org)
+**让多端应用开发变得简单** — 可视化拖拽画布 · 142 个中文函数逻辑编排 · AI 对话一键生成全栈应用
+
+- **在线使用文档**：[https://licensetob.github.io/QCFLOW/](https://licensetob.github.io/QCFLOW/)
+- **官方交流 QQ 群**：[点击加入【QCFlutterFlow_中文编程】（群号：309744493）](https://qm.qq.com/q/ywiNks7JpQ)
 
 ---
 
-VitePress is a Vue-powered static site generator and a spiritual successor to [VuePress](https://vuepress.vuejs.org), built on top of [Vite](https://github.com/vitejs/vite).
+## 客户端安装包下载 (v1.0.0)
 
-## Documentation
+### 渠道一：蓝奏云高速下载（国内推荐）
+- **下载地址**：[https://anonymous1.lanzouv.com/b02sgz4ble](https://anonymous1.lanzouv.com/b02sgz4ble)
+- **提取密码**：`afd5`
 
-To check out docs, visit [vitepress.dev](https://vitepress.dev).
+### 渠道二：Git 仓库直链下载
 
-## Changelog
-
-Detailed changes for each release are documented in the [CHANGELOG](https://github.com/vuejs/vitepress/blob/main/CHANGELOG.md).
-
-## Contribution
-
-Please make sure to read the [Contributing Guide](https://github.com/vuejs/vitepress/blob/main/.github/contributing.md) before making a pull request.
-
-## License
-
-[MIT](https://github.com/vuejs/vitepress/blob/main/LICENSE)
-
-Copyright (c) 2019-present, Yuxi (Evan) You
+| 平台 | 安装包文件 | GitHub 下载 | Gitee 下载 |
+| :--- | :--- | :--- | :--- |
+| **Windows** | `qcflow_windows_v1.0.0_build1.zip` (45 MB) | [GitHub 下载 Windows 版](https://github.com/licensetob/QCFLOW/raw/main/releases/qcflow_windows_v1.0.0_build1.zip) | [Gitee 下载 Windows 版](https://gitee.com/zanonymous/qcflow/blob/main/releases/qcflow_windows_v1.0.0_build1.zip) |
+| **macOS** | `qcflow_macos_v1.0.0_build1.dmg` (61 MB) | [GitHub 下载 macOS 版](https://github.com/licensetob/QCFLOW/raw/main/releases/qcflow_macos_v1.0.0_build1.dmg) | [Gitee 下载 macOS 版](https://gitee.com/zanonymous/qcflow/blob/main/releases/qcflow_macos_v1.0.0_build1.dmg) |

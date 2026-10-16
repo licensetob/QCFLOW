@@ -69,19 +69,19 @@
                                                 <span class="dl-pop-badge badge-emerald">国内极速</span>
                                             </div>
                                             <span class="dl-pop-desc">
-                                                {{ downloadConfig.lanzou.password ? `提取码：${downloadConfig.lanzou.password}（点击自动复制）` : '免登录高速直连网盘' }}
+                                                提取码：<strong class="dl-pop-pwd">{{ downloadConfig.lanzou.password }}</strong>（点击自动复制并跳转）
                                             </span>
                                         </div>
                                     </div>
                                     <div class="dl-pop-go">
-                                        <span>下载</span>
+                                        <span>前往</span>
                                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M7 17L17 7M7 7h10v10"/>
                                         </svg>
                                     </div>
                                 </div>
 
-                                <!-- 渠道二：Git 下载（分为 GitHub 和 Gitee） -->
+                                <!-- 渠道二：Git 下载（分为 GitHub 和 Gitee，均支持 Windows .zip 与 macOS .dmg） -->
                                 <div class="dl-pop-git-block">
                                     <div class="dl-pop-git-header">
                                         <div class="dl-pop-git-label">
@@ -91,24 +91,47 @@
                                                 <path d="M13 6h3a2 2 0 0 1 2 2v7"/>
                                                 <line x1="6" y1="9" x2="6" y2="21"/>
                                             </svg>
-                                            <span>Git 仓库发行版下载</span>
+                                            <span>Git 仓库直链下载</span>
                                         </div>
                                         <span class="dl-pop-git-sub">GitHub / Gitee 双源</span>
                                     </div>
 
-                                    <div class="dl-pop-git-btns">
-                                        <button type="button" class="dl-pop-git-btn is-github" @click.stop="handleGitDownload('github')">
-                                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                                                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/>
-                                            </svg>
-                                            <span>GitHub 下载</span>
-                                        </button>
-                                        <button type="button" class="dl-pop-git-btn is-gitee" @click.stop="handleGitDownload('gitee')">
-                                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                                                <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z"/>
-                                            </svg>
-                                            <span>Gitee 下载</span>
-                                        </button>
+                                    <div class="dl-pop-git-sources">
+                                        <!-- GitHub 源 -->
+                                        <div class="dl-pop-source-row">
+                                            <a :href="downloadConfig.git.github.releaseUrl" target="_blank" rel="noopener noreferrer" class="dl-pop-source-brand" @click.stop>
+                                                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                                                    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/>
+                                                </svg>
+                                                <span>GitHub</span>
+                                            </a>
+                                            <div class="dl-pop-os-btns">
+                                                <a :href="downloadConfig.git.github.winUrl" target="_blank" rel="noopener noreferrer" class="dl-pop-os-btn is-github" @click.stop>
+                                                    Windows (.zip)
+                                                </a>
+                                                <a :href="downloadConfig.git.github.macUrl" target="_blank" rel="noopener noreferrer" class="dl-pop-os-btn is-github" @click.stop>
+                                                    macOS (.dmg)
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Gitee 源 -->
+                                        <div class="dl-pop-source-row">
+                                            <a :href="downloadConfig.git.gitee.releaseUrl" target="_blank" rel="noopener noreferrer" class="dl-pop-source-brand is-gitee-brand" @click.stop>
+                                                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                                                    <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z"/>
+                                                </svg>
+                                                <span>Gitee</span>
+                                            </a>
+                                            <div class="dl-pop-os-btns">
+                                                <a :href="downloadConfig.git.gitee.winUrl" target="_blank" rel="noopener noreferrer" class="dl-pop-os-btn is-gitee" @click.stop>
+                                                    Windows (.zip)
+                                                </a>
+                                                <a :href="downloadConfig.git.gitee.macUrl" target="_blank" rel="noopener noreferrer" class="dl-pop-os-btn is-gitee" @click.stop>
+                                                    macOS (.dmg)
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -189,7 +212,7 @@
                                         <h2 id="qc-download-title" class="qc-modal-title">下载 QC Flutter Flow</h2>
                                         <span class="qc-modal-version">{{ downloadConfig.version }}</span>
                                     </div>
-                                    <p class="qc-modal-subtitle">支持蓝奏云高速网盘与 Git（GitHub / Gitee）双平台官方发行版</p>
+                                    <p class="qc-modal-subtitle">支持蓝奏云高速网盘与 Git（GitHub / Gitee）双平台官方直链下载</p>
                                 </div>
                             </div>
                             <button type="button" class="qc-modal-close" aria-label="关闭下载窗口" @click="closeDownloadModal">
@@ -224,14 +247,10 @@
                                 </div>
 
                                 <div class="dl-lanzou-actions">
-                                    <div v-if="downloadConfig.lanzou.password" class="dl-pwd-box" @click="copyLanzouPassword">
+                                    <div class="dl-pwd-box" @click="copyLanzouPassword">
                                         <span class="dl-pwd-label">提取码</span>
                                         <code class="dl-pwd-code">{{ downloadConfig.lanzou.password }}</code>
                                         <span class="dl-pwd-copy">{{ copiedPwd ? '✓ 已复制' : '点击复制' }}</span>
-                                    </div>
-                                    <div v-else class="dl-pwd-box dl-pwd-free">
-                                        <span class="dl-pwd-dot"></span>
-                                        <span>免登录 · 国内高速直链下载</span>
                                     </div>
 
                                     <button type="button" class="dl-primary-btn btn-lanzou-go" @click="handleLanzouDownload">
@@ -240,7 +259,7 @@
                                             <polyline points="7 10 12 15 17 10" />
                                             <line x1="12" y1="15" x2="12" y2="3" />
                                         </svg>
-                                        <span>前往蓝奏云下载</span>
+                                        <span>自动复制密码并前往蓝奏云</span>
                                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M7 17L17 7M7 7h10v10"/>
                                         </svg>
@@ -266,12 +285,13 @@
                                                 <h3 class="dl-channel-name">Git 仓库下载</h3>
                                                 <span class="dl-tag tag-git">分为 GitHub 与 Gitee</span>
                                             </div>
-                                            <p class="dl-channel-desc">从开源托管平台 Release 发行版直接拉取最新安装包，支持国际源与国内镜像源</p>
+                                            <p class="dl-channel-desc">从开源托管平台直接下载 Windows (.zip) 或 macOS (.dmg) 安装包</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="dl-git-grid">
+                                    <!-- GitHub 卡片 -->
                                     <div class="dl-git-subcard subcard-github">
                                         <div class="dl-git-subcard-top">
                                             <div class="dl-git-brand">
@@ -285,16 +305,20 @@
                                                     <div class="dl-git-meta">{{ downloadConfig.git.github.badge }}</div>
                                                 </div>
                                             </div>
+                                            <a :href="downloadConfig.git.github.releaseUrl" target="_blank" rel="noopener noreferrer" class="dl-git-repo-link">仓库 ↗</a>
                                         </div>
                                         <p class="dl-git-subdesc">{{ downloadConfig.git.github.description }}</p>
-                                        <button type="button" class="dl-git-action-btn btn-github" @click="handleGitDownload('github')">
-                                            <span>GitHub Releases 下载</span>
-                                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M7 17L17 7M7 7h10v10"/>
-                                            </svg>
-                                        </button>
+                                        <div class="dl-git-dual-btns">
+                                            <a :href="downloadConfig.git.github.winUrl" target="_blank" rel="noopener noreferrer" class="dl-git-action-btn btn-github">
+                                                <span>Windows (.zip)</span>
+                                            </a>
+                                            <a :href="downloadConfig.git.github.macUrl" target="_blank" rel="noopener noreferrer" class="dl-git-action-btn btn-github-outline">
+                                                <span>macOS (.dmg)</span>
+                                            </a>
+                                        </div>
                                     </div>
 
+                                    <!-- Gitee 卡片 -->
                                     <div class="dl-git-subcard subcard-gitee">
                                         <div class="dl-git-subcard-top">
                                             <div class="dl-git-brand">
@@ -308,23 +332,26 @@
                                                     <div class="dl-git-meta">{{ downloadConfig.git.gitee.badge }}</div>
                                                 </div>
                                             </div>
+                                            <a :href="downloadConfig.git.gitee.releaseUrl" target="_blank" rel="noopener noreferrer" class="dl-git-repo-link">仓库 ↗</a>
                                         </div>
                                         <p class="dl-git-subdesc">{{ downloadConfig.git.gitee.description }}</p>
-                                        <button type="button" class="dl-git-action-btn btn-gitee" @click="handleGitDownload('gitee')">
-                                            <span>Gitee 发行版下载</span>
-                                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M7 17L17 7M7 7h10v10"/>
-                                            </svg>
-                                        </button>
+                                        <div class="dl-git-dual-btns">
+                                            <a :href="downloadConfig.git.gitee.winUrl" target="_blank" rel="noopener noreferrer" class="dl-git-action-btn btn-gitee">
+                                                <span>Windows (.zip)</span>
+                                            </a>
+                                            <a :href="downloadConfig.git.gitee.macUrl" target="_blank" rel="noopener noreferrer" class="dl-git-action-btn btn-gitee-outline">
+                                                <span>macOS (.dmg)</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="qc-modal-footer">
-                            <span class="qc-modal-footer-tip">遇到安装问题或需要历史版本？</span>
+                            <span class="qc-modal-footer-tip">遇到安装问题或需要技术交流？</span>
                             <a href="https://qm.qq.com/q/ywiNks7JpQ" target="_blank" rel="noopener noreferrer" class="qc-modal-footer-qq">
-                                加入官方 QQ 群【QCFlutterFlow_中文编程】获取支持 →
+                                加入官方 QQ 群【QCFlutterFlow_中文编程】 →
                             </a>
                         </div>
 
@@ -432,24 +459,11 @@ async function handleLanzouDownload() {
         try {
             await navigator.clipboard.writeText(downloadConfig.lanzou.password)
             copiedPwd.value = true
+            showToast(`已自动复制提取码 ${downloadConfig.lanzou.password}，正在前往蓝奏云...`)
         } catch {}
     }
     if (downloadConfig.lanzou.url) {
         window.open(downloadConfig.lanzou.url, '_blank', 'noopener,noreferrer')
-    } else {
-        showDownloadModal.value = true
-        showToast('蓝奏云安装包链接即将同步上线，敬请期待！')
-    }
-}
-
-function handleGitDownload(provider) {
-    const target = provider === 'github' ? downloadConfig.git.github : downloadConfig.git.gitee
-    const targetUrl = target.directUrl || target.releaseUrl
-    if (targetUrl) {
-        window.open(targetUrl, '_blank', 'noopener,noreferrer')
-    } else {
-        showDownloadModal.value = true
-        showToast(`${target.name}安装包链接即将同步上线，敬请期待！`)
     }
 }
 
@@ -471,8 +485,8 @@ function updatePlacement(key = 0) {
     const vw = window.innerWidth
     const vh = window.innerHeight
 
-    const CARD_H = key === 'download' ? 250 : 325
-    const CARD_W = key === 'download' ? 340 : 240
+    const CARD_H = key === 'download' ? 280 : 325
+    const CARD_W = key === 'download' ? 350 : 240
     const GAP = 16
     const NAV_H = 68
     const EDGE = 16
@@ -835,7 +849,7 @@ onBeforeUnmount(() => {
 /* =========================== 悬浮卡片 1：双渠道下载悬浮面板 =========================== */
 .dl-popover-card {
     position: relative;
-    width: 320px;
+    width: 344px;
     padding: 14px;
     background: #18181b;
     border-radius: 16px;
@@ -964,10 +978,13 @@ onBeforeUnmount(() => {
 .dl-pop-desc {
     display: block;
     font-size: 11.5px;
-    color: rgba(255, 255, 255, 0.62);
+    color: rgba(255, 255, 255, 0.68);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+.dl-pop-pwd {
+    color: #4ade80;
+    font-family: var(--vp-font-family-mono);
 }
 
 .dl-pop-go {
@@ -1018,45 +1035,73 @@ onBeforeUnmount(() => {
     color: rgba(255, 255, 255, 0.48);
 }
 
-.dl-pop-git-btns {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+.dl-pop-git-sources {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
 }
 
-.dl-pop-git-btn {
+.dl-pop-source-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dl-pop-source-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+}
+
+.is-gitee-brand svg {
+    color: #f87171;
+}
+
+.dl-pop-os-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dl-pop-os-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 10px;
-    border-radius: 9px;
-    font-size: 12.5px;
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-size: 11.5px;
     font-weight: 600;
-    cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-decoration: none;
     color: #fff;
-    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    transition: all 0.18s ease;
 }
 
-.dl-pop-git-btn.is-github {
-    background: #24292f;
+.dl-pop-os-btn.is-github {
+    background: #272c33;
 }
 
-.dl-pop-git-btn.is-github:hover {
-    background: #363d45;
-    border-color: #6366f1;
-    transform: translateY(-1px);
+.dl-pop-os-btn.is-github:hover {
+    background: #6366f1;
+    border-color: #818cf8;
 }
 
-.dl-pop-git-btn.is-gitee {
-    background: #b91c1c;
+.dl-pop-os-btn.is-gitee {
+    background: rgba(185, 28, 28, 0.65);
 }
 
-.dl-pop-git-btn.is-gitee:hover {
+.dl-pop-os-btn.is-gitee:hover {
     background: #dc2626;
     border-color: #f87171;
-    transform: translateY(-1px);
 }
 
 /* =========================== 悬浮卡片 2：QQ 群二维码卡片 =========================== */
@@ -1337,19 +1382,6 @@ onBeforeUnmount(() => {
     cursor: pointer;
 }
 
-.dl-pwd-free {
-    cursor: default;
-    color: var(--vp-c-text-2);
-}
-
-.dl-pwd-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #0ea5e9;
-    box-shadow: 0 0 8px #0ea5e9;
-}
-
 .dl-pwd-label {
     color: var(--vp-c-text-2);
 }
@@ -1357,7 +1389,7 @@ onBeforeUnmount(() => {
 .dl-pwd-code {
     font-weight: 700;
     color: var(--vp-c-brand-1);
-    font-size: 13px;
+    font-size: 13.5px;
 }
 
 .dl-pwd-copy {
@@ -1459,6 +1491,16 @@ onBeforeUnmount(() => {
     color: var(--vp-c-text-2);
 }
 
+.dl-git-repo-link {
+    font-size: 12px;
+    color: var(--vp-c-text-2);
+    text-decoration: none;
+}
+
+.dl-git-repo-link:hover {
+    color: var(--vp-c-brand-1);
+}
+
 .dl-git-subdesc {
     margin: 0 0 12px;
     font-size: 12px;
@@ -1466,16 +1508,21 @@ onBeforeUnmount(() => {
     line-height: 1.45;
 }
 
+.dl-git-dual-btns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
 .dl-git-action-btn {
-    width: 100%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 9px 14px;
+    padding: 8px 10px;
     border-radius: 9px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
     border: 1px solid var(--vp-c-divider);
     transition: all 0.2s ease;
@@ -1492,6 +1539,18 @@ onBeforeUnmount(() => {
     transform: translateY(-1px);
 }
 
+.btn-github-outline {
+    background: var(--vp-c-bg-soft);
+    color: var(--vp-c-text-1);
+    border-color: var(--vp-c-divider);
+}
+
+.btn-github-outline:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    transform: translateY(-1px);
+}
+
 .btn-gitee {
     background: #c71d23;
     color: #fff;
@@ -1500,6 +1559,18 @@ onBeforeUnmount(() => {
 
 .btn-gitee:hover {
     background: #de2930;
+    transform: translateY(-1px);
+}
+
+.btn-gitee-outline {
+    background: var(--vp-c-bg-soft);
+    color: var(--vp-c-text-1);
+    border-color: var(--vp-c-divider);
+}
+
+.btn-gitee-outline:hover {
+    border-color: #c71d23;
+    color: #c71d23;
     transform: translateY(-1px);
 }
 
