@@ -3,16 +3,8 @@
     <div class="qc-hero">
         <!-- 内容容器：限制最大宽度，控制内容的整体布局 -->
         <div class="container">
-            <!-- 文本内容区域：包含标题、副标题、描述、主操作按钮与双渠道快捷入口 -->
+            <!-- 文本内容区域：包含标题、副标题、描述与双核心按钮 -->
             <div class="main">
-                <!-- 版本与状态徽章 -->
-                <div class="hero-pill" @click="openDownloadModal('lanzou')">
-                    <span class="hero-pill-dot"></span>
-                    <span class="hero-pill-version">{{ downloadConfig.version }} 桌面客户端</span>
-                    <span class="hero-pill-divider">|</span>
-                    <span class="hero-pill-link">支持蓝奏云 · GitHub · Gitee 下载 ↗</span>
-                </div>
-
                 <!-- 主标题区域 -->
                 <h1 class="heading">
                     <!-- 品牌名称：带有品牌色的主要标题 -->
@@ -23,14 +15,19 @@
                 <!-- 标语：描述性文本，位于标题下方 -->
                 <p class="tagline">{{ tagline }}</p>
 
-                <!-- 操作按钮区域：包含立即下载按钮与加入QQ群按钮 -->
+                <!-- 操作按钮区域：左「立即下载客户端」，右「加入QQ群」 -->
                 <div class="actions">
-                    <!-- 主下载按钮：点击打开精致双渠道下载中心弹窗 -->
-                    <div class="action">
-                        <button type="button" class="btn btn-brand btn-download-main" @click="openDownloadModal('all')">
+                    <!-- 按钮 1：立即下载客户端（悬停弹出双渠道快捷下载卡片，点击也可打开下载中心弹窗） -->
+                    <div class="action" :ref="el => setBtnRef(el, 'download')" @mouseenter="updatePlacement('download')">
+                        <button
+                            type="button"
+                            class="btn btn-download-main"
+                            @click="openDownloadModal"
+                            @focus="updatePlacement('download')"
+                        >
                             <span class="btn-shimmer"></span>
                             <span class="btn-content">
-                                <svg class="download-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <svg class="btn-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                     <polyline points="7 10 12 15 17 10" />
                                     <line x1="12" y1="15" x2="12" y2="3" />
@@ -39,21 +36,102 @@
                                 <span class="btn-version-tag">{{ downloadConfig.version }}</span>
                             </span>
                         </button>
+
+                        <!-- 悬停展示：精致双渠道下载悬浮面板（蓝奏云 + Git [GitHub & Gitee]） -->
+                        <div
+                            v-show="!showDownloadModal"
+                            :class="['hero-popover', 'download-popover', `is-${placements.download || 'bottom'}`]"
+                            :style="{ '--popover-shift-y': `${shiftYs.download || 0}px` }"
+                        >
+                            <div class="hero-popover-arrow"></div>
+                            <div class="dl-popover-card">
+                                <div class="dl-pop-header">
+                                    <div class="dl-pop-header-left">
+                                        <span class="dl-pop-dot"></span>
+                                        <span class="dl-pop-title">选择下载渠道</span>
+                                    </div>
+                                    <span class="dl-pop-ver">{{ downloadConfig.version }} 正式版</span>
+                                </div>
+
+                                <!-- 渠道一：蓝奏云下载 -->
+                                <div class="dl-pop-channel dl-pop-lanzou" @click.stop="handleLanzouDownload">
+                                    <div class="dl-pop-channel-left">
+                                        <div class="dl-pop-icon lanzou-gradient">
+                                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+                                                <path d="M12 13v5"/>
+                                                <path d="m9.5 15.5 2.5 2.5 2.5-2.5"/>
+                                            </svg>
+                                        </div>
+                                        <div class="dl-pop-info">
+                                            <div class="dl-pop-name-row">
+                                                <span class="dl-pop-name">蓝奏云下载</span>
+                                                <span class="dl-pop-badge badge-emerald">国内极速</span>
+                                            </div>
+                                            <span class="dl-pop-desc">
+                                                {{ downloadConfig.lanzou.password ? `提取码：${downloadConfig.lanzou.password}（点击自动复制）` : '免登录高速直连网盘' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="dl-pop-go">
+                                        <span>下载</span>
+                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M7 17L17 7M7 7h10v10"/>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- 渠道二：Git 下载（分为 GitHub 和 Gitee） -->
+                                <div class="dl-pop-git-block">
+                                    <div class="dl-pop-git-header">
+                                        <div class="dl-pop-git-label">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="18" cy="18" r="3"/>
+                                                <circle cx="6" cy="6" r="3"/>
+                                                <path d="M13 6h3a2 2 0 0 1 2 2v7"/>
+                                                <line x1="6" y1="9" x2="6" y2="21"/>
+                                            </svg>
+                                            <span>Git 仓库发行版下载</span>
+                                        </div>
+                                        <span class="dl-pop-git-sub">GitHub / Gitee 双源</span>
+                                    </div>
+
+                                    <div class="dl-pop-git-btns">
+                                        <button type="button" class="dl-pop-git-btn is-github" @click.stop="handleGitDownload('github')">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                                                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/>
+                                            </svg>
+                                            <span>GitHub 下载</span>
+                                        </button>
+                                        <button type="button" class="dl-pop-git-btn is-gitee" @click.stop="handleGitDownload('gitee')">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                                                <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z"/>
+                                            </svg>
+                                            <span>Gitee 下载</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- 单个按钮容器（QQ群按钮：支持悬停自动方向弹出二维码、点击直接跳转） -->
-                    <div v-for="(action, idx) in actions" :key="action.link" class="action">
+                    <!-- 按钮 2：加入QQ群按钮（悬停弹出二维码卡片，点击直接跳转加群链接） -->
+                    <div
+                        v-for="(action, idx) in actions"
+                        :key="action.link"
+                        class="action"
+                        :ref="el => setBtnRef(el, idx)"
+                        @mouseenter="updatePlacement(idx)"
+                    >
                         <a
-                            :ref="el => setBtnRef(el, idx)"
                             :href="action.link.startsWith('http') ? action.link : withBase(action.link)"
                             :class="['btn', 'btn-qq-glass', { 'has-qrcode': action.qrcode !== false }]"
                             :target="action.target"
                             :rel="action.rel"
-                            @mouseenter="updatePlacement(idx)"
                             @focus="updatePlacement(idx)"
                         >
                             <span class="btn-content">
-                                <svg class="qq-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                                <svg class="btn-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
                                     <path d="M12.003 2c-2.265 0-6.29 1.364-6.29 7.325v1.195S3.55 14.96 3.55 17.474c0 .665.17 1.025.281 1.025.114 0 .902-.484 1.748-2.072 0 0-.18 2.197 1.904 3.967 0 0-1.77.495-1.77 1.182 0 .686 4.078.43 6.29 0 2.239.425 6.287.687 6.287 0 0-.688-1.768-1.768-1.182 2.085-1.77 1.905-3.967 1.905-3.967.845 1.588 1.634 2.072 1.746 2.072.111 0 .283-.36.283-1.025 0-2.514-2.166-6.954-2.166-6.954V9.325C18.29 3.364 14.268 2 12.003 2z"/>
                                 </svg>
                                 <span>{{ action.text }}</span>
@@ -68,10 +146,10 @@
                             <!-- 悬停展示群二维码弹层（自动根据屏幕剩余空间选择上/下/右侧弹出），点击同样直接跳转加群链接 -->
                             <div
                                 v-if="action.qrcode !== false"
-                                :class="['qrcode-popover', `is-${placements[idx] || 'top'}`]"
+                                :class="['hero-popover', 'qrcode-popover', `is-${placements[idx] || 'bottom'}`]"
                                 :style="{ '--popover-shift-y': `${shiftYs[idx] || 0}px` }"
                             >
-                                <div class="qrcode-popover-arrow"></div>
+                                <div class="hero-popover-arrow"></div>
                                 <div class="qrcode-card">
                                     <div class="qrcode-img-wrapper">
                                         <img :src="withBase(action.qrcode || '/qq-qrcode.jpg')" alt="QCFlutterFlow_中文编程 QQ群二维码" class="qrcode-img" />
@@ -85,73 +163,6 @@
                         </a>
                     </div>
                 </div>
-
-                <!-- 首页直达：双渠道精致快捷下载面板（渠道一：蓝奏云 / 渠道二：Git 下载 [GitHub & Gitee]） -->
-                <div class="quick-channels">
-                    <div class="quick-channels-header">
-                        <span class="quick-channels-title">官方下载渠道</span>
-                        <span class="quick-channels-sub">提供国内高速网盘与双 Git 仓库发行版</span>
-                    </div>
-
-                    <div class="quick-channels-grid">
-                        <!-- 渠道一：蓝奏云下载 -->
-                        <div class="channel-mini-card channel-lanzou" @click="handleLanzouDownload">
-                            <div class="channel-mini-icon lanzou-gradient">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
-                                    <path d="M12 13v5"/>
-                                    <path d="m9.5 15.5 2.5 2.5 2.5-2.5"/>
-                                </svg>
-                            </div>
-                            <div class="channel-mini-body">
-                                <div class="channel-mini-top">
-                                    <span class="channel-mini-name">蓝奏云下载</span>
-                                    <span class="channel-mini-badge badge-green">高速推荐</span>
-                                </div>
-                                <span class="channel-mini-desc">
-                                    {{ downloadConfig.lanzou.password ? `国内极速直连 · 提取码 ${downloadConfig.lanzou.password}` : '国内多节点极速网盘直连' }}
-                                </span>
-                            </div>
-                            <div class="channel-mini-arrow">
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M7 17L17 7M7 7h10v10"/>
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- 渠道二：Git 下载（分为 GitHub 和 Gitee） -->
-                        <div class="channel-mini-card channel-git">
-                            <div class="channel-mini-icon git-gradient">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="18" cy="18" r="3"/>
-                                    <circle cx="6" cy="6" r="3"/>
-                                    <path d="M13 6h3a2 2 0 0 1 2 2v7"/>
-                                    <line x1="6" y1="9" x2="6" y2="21"/>
-                                </svg>
-                            </div>
-                            <div class="channel-mini-body">
-                                <div class="channel-mini-top">
-                                    <span class="channel-mini-name">Git 发行版下载</span>
-                                    <span class="channel-mini-badge badge-blue">双源仓库</span>
-                                </div>
-                                <div class="git-mini-buttons">
-                                    <button type="button" class="git-pill-btn github-pill" @click.stop="handleGitDownload('github')">
-                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                                            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/>
-                                        </svg>
-                                        <span>GitHub</span>
-                                    </button>
-                                    <button type="button" class="git-pill-btn gitee-pill" @click.stop="handleGitDownload('gitee')">
-                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                                            <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z"/>
-                                        </svg>
-                                        <span>Gitee</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- 图片区域：包含logo和背景效果 -->
@@ -163,15 +174,13 @@
             </div>
         </div>
 
-        <!-- =========================== 精致双渠道下载中心弹窗 =========================== -->
+        <!-- =========================== 点击呼出：精致双渠道下载中心弹窗 =========================== -->
         <Teleport to="body">
             <Transition name="qc-modal-fade">
                 <div v-if="showDownloadModal" class="qc-modal-overlay" @click.self="closeDownloadModal">
                     <div class="qc-modal-panel" role="dialog" aria-modal="true" aria-labelledby="qc-download-title">
-                        <!-- 顶部发光装饰线 -->
                         <div class="qc-modal-glow-bar"></div>
 
-                        <!-- 弹窗头部 -->
                         <div class="qc-modal-header">
                             <div class="qc-modal-brand">
                                 <img :src="withBase('/qc-logo.png')" alt="QC Logo" class="qc-modal-logo" />
@@ -180,7 +189,7 @@
                                         <h2 id="qc-download-title" class="qc-modal-title">下载 QC Flutter Flow</h2>
                                         <span class="qc-modal-version">{{ downloadConfig.version }}</span>
                                     </div>
-                                    <p class="qc-modal-subtitle">选择适合您的下载渠道 · 支持蓝奏云网盘与 GitHub / Gitee 官方仓库</p>
+                                    <p class="qc-modal-subtitle">支持蓝奏云高速网盘与 Git（GitHub / Gitee）双平台官方发行版</p>
                                 </div>
                             </div>
                             <button type="button" class="qc-modal-close" aria-label="关闭下载窗口" @click="closeDownloadModal">
@@ -191,7 +200,6 @@
                             </button>
                         </div>
 
-                        <!-- 弹窗内容：两大下载渠道 -->
                         <div class="qc-modal-body">
                             <!-- 渠道一：蓝奏云高速网盘 -->
                             <div class="dl-channel-block dl-channel-lanzou">
@@ -216,7 +224,6 @@
                                 </div>
 
                                 <div class="dl-lanzou-actions">
-                                    <!-- 提取码展示与一键复制（若有提取码） -->
                                     <div v-if="downloadConfig.lanzou.password" class="dl-pwd-box" @click="copyLanzouPassword">
                                         <span class="dl-pwd-label">提取码</span>
                                         <code class="dl-pwd-code">{{ downloadConfig.lanzou.password }}</code>
@@ -224,7 +231,7 @@
                                     </div>
                                     <div v-else class="dl-pwd-box dl-pwd-free">
                                         <span class="dl-pwd-dot"></span>
-                                        <span>免登录 · 高速直链下载</span>
+                                        <span>免登录 · 国内高速直链下载</span>
                                     </div>
 
                                     <button type="button" class="dl-primary-btn btn-lanzou-go" @click="handleLanzouDownload">
@@ -257,16 +264,14 @@
                                             <div class="dl-channel-name-row">
                                                 <span class="dl-channel-step">渠道二</span>
                                                 <h3 class="dl-channel-name">Git 仓库下载</h3>
-                                                <span class="dl-tag tag-git">GitHub & Gitee 双平台</span>
+                                                <span class="dl-tag tag-git">分为 GitHub 与 Gitee</span>
                                             </div>
                                             <p class="dl-channel-desc">从开源托管平台 Release 发行版直接拉取最新安装包，支持国际源与国内镜像源</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Git 双子渠道卡片：GitHub 与 Gitee -->
                                 <div class="dl-git-grid">
-                                    <!-- 子渠道 2A：GitHub -->
                                     <div class="dl-git-subcard subcard-github">
                                         <div class="dl-git-subcard-top">
                                             <div class="dl-git-brand">
@@ -290,7 +295,6 @@
                                         </button>
                                     </div>
 
-                                    <!-- 子渠道 2B：Gitee (码云) -->
                                     <div class="dl-git-subcard subcard-gitee">
                                         <div class="dl-git-subcard-top">
                                             <div class="dl-git-brand">
@@ -317,7 +321,6 @@
                             </div>
                         </div>
 
-                        <!-- 弹窗底部提示栏 -->
                         <div class="qc-modal-footer">
                             <span class="qc-modal-footer-tip">遇到安装问题或需要历史版本？</span>
                             <a href="https://qm.qq.com/q/ywiNks7JpQ" target="_blank" rel="noopener noreferrer" class="qc-modal-footer-qq">
@@ -325,7 +328,6 @@
                             </a>
                         </div>
 
-                        <!-- 轻提示 Toast -->
                         <Transition name="qc-toast-fade">
                             <div v-if="toastMessage" class="qc-toast">
                                 <span class="qc-toast-dot"></span>
@@ -336,7 +338,6 @@
                 </div>
             </Transition>
 
-            <!-- 页面级轻提示（当未打开弹窗直接点击快捷卡片时展示） -->
             <Transition name="qc-toast-fade">
                 <div v-if="toastMessage && !showDownloadModal" class="qc-toast qc-toast-fixed">
                     <span class="qc-toast-dot"></span>
@@ -388,7 +389,7 @@ const props = defineProps({
     }
 })
 
-const btnRefs = ref([])
+const btnRefs = reactive({})
 const placements = reactive({})
 const shiftYs = reactive({})
 const showDownloadModal = ref(false)
@@ -452,55 +453,56 @@ function handleGitDownload(provider) {
     }
 }
 
-function setBtnRef(el, idx) {
+function setBtnRef(el, key) {
     if (el) {
-        btnRefs.value[idx] = el
+        btnRefs[key] = el
     }
 }
 
 /**
- * 自动计算二维码气泡最佳弹出方向（下 / 上 / 右），防止超出视口被遮挡
+ * 自动计算悬浮气泡最佳弹出方向（下 / 上 / 右），确保不被视口边缘遮挡
  */
-function updatePlacement(idx = 0) {
+function updatePlacement(key = 0) {
     if (typeof window === 'undefined') return
-    const el = btnRefs.value[idx]
+    const el = btnRefs[key]
     if (!el) return
 
     const rect = el.getBoundingClientRect()
     const vw = window.innerWidth
     const vh = window.innerHeight
 
-    const CARD_H = 325 // 二维码气泡高度预估
-    const CARD_W = 240 // 二维码气泡宽度预估
+    const CARD_H = key === 'download' ? 250 : 325
+    const CARD_W = key === 'download' ? 340 : 240
     const GAP = 16
-    const NAV_H = 68   // 顶部导航栏安全高度
-    const EDGE = 16    // 视口边缘安全间距
+    const NAV_H = 68
+    const EDGE = 16
 
     const spaceBottom = vh - rect.bottom - EDGE
     const spaceTop = rect.top - NAV_H - EDGE
     const spaceRight = vw - rect.right - EDGE
 
-    shiftYs[idx] = 0
+    shiftYs[key] = 0
 
     if (spaceBottom >= CARD_H + GAP) {
-        placements[idx] = 'bottom'
+        placements[key] = 'bottom'
     } else if (spaceTop >= CARD_H + GAP) {
-        placements[idx] = 'top'
+        placements[key] = 'top'
     } else if (spaceRight >= CARD_W + GAP && vw >= 640) {
-        placements[idx] = 'right'
+        placements[key] = 'right'
         const centerY = rect.top + rect.height / 2
         const halfH = CARD_H / 2
         if (centerY - halfH < NAV_H + EDGE) {
-            shiftYs[idx] = (NAV_H + EDGE) - (centerY - halfH)
+            shiftYs[key] = (NAV_H + EDGE) - (centerY - halfH)
         } else if (centerY + halfH > vh - EDGE) {
-            shiftYs[idx] = (vh - EDGE) - (centerY + halfH)
+            shiftYs[key] = (vh - EDGE) - (centerY + halfH)
         }
     } else {
-        placements[idx] = spaceTop >= spaceBottom ? 'top' : 'bottom'
+        placements[key] = spaceTop >= spaceBottom ? 'top' : 'bottom'
     }
 }
 
 function updateAllPlacements() {
+    updatePlacement('download')
     props.actions.forEach((_, idx) => updatePlacement(idx))
 }
 
@@ -537,7 +539,7 @@ onBeforeUnmount(() => {
 }
 
 .qc-hero {
-    padding: 32px 0;
+    padding: 0;
     text-align: center;
     min-height: calc(100vh - 64px);
     display: flex;
@@ -563,6 +565,8 @@ onBeforeUnmount(() => {
     text-align: left;
     order: 1;
     width: 100%;
+    position: relative;
+    z-index: 30;
 }
 
 .image {
@@ -573,98 +577,66 @@ onBeforeUnmount(() => {
     height: 400px;
     order: 2;
     flex-shrink: 0;
-}
-
-/* =========================== 顶部版本胶囊 =========================== */
-.hero-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    margin-bottom: 20px;
-    border-radius: 999px;
-    background: rgba(46, 223, 4, 0.08);
-    border: 1px solid rgba(46, 223, 4, 0.25);
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--vp-c-text-1);
-    cursor: pointer;
-    transition: all 0.25s ease;
-}
-
-.hero-pill:hover {
-    background: rgba(46, 223, 4, 0.14);
-    border-color: rgba(46, 223, 4, 0.45);
-    transform: translateY(-1px);
-}
-
-.hero-pill-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #2EDF04;
-    box-shadow: 0 0 8px #2EDF04;
-}
-
-.hero-pill-version {
-    font-weight: 600;
-    color: var(--vp-c-brand-1);
-}
-
-.hero-pill-divider {
-    opacity: 0.3;
-}
-
-.hero-pill-link {
-    color: var(--vp-c-text-2);
+    position: relative;
+    z-index: 1;
 }
 
 /* =========================== 文本样式 =========================== */
 .heading {
     margin: 0;
-    line-height: 1.18;
-    font-size: 3.4rem;
+    line-height: 1.2;
+    font-size: 3.5rem;
     font-weight: 700;
 }
 
 .name {
     color: var(--vp-c-brand-1);
     display: block;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .text {
     display: block;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     color: var(--vp-c-text-1);
 }
 
 .tagline {
-    margin: 0 0 28px;
-    font-size: 1.18rem;
+    margin: 0 0 36px;
+    font-size: 1.22rem;
     line-height: 1.6;
     color: var(--vp-c-text-2);
     max-width: 600px;
 }
 
-/* =========================== 按钮与悬浮二维码样式 =========================== */
+/* =========================== 双核心按钮组 =========================== */
 .actions {
+    position: relative;
+    z-index: 500;
     display: flex;
-    gap: 14px;
+    align-items: center;
+    gap: 16px;
     justify-content: flex-start;
     flex-wrap: wrap;
-    margin-bottom: 28px;
 }
 
 .action {
     position: relative;
+    z-index: 10;
+}
+
+.action:hover,
+.action:focus-within {
+    z-index: 600;
 }
 
 .btn {
     position: relative;
     display: inline-flex;
     align-items: center;
-    padding: 13px 24px;
+    justify-content: center;
+    height: 48px;
+    padding: 0 24px;
     border-radius: 12px;
     text-decoration: none;
     font-size: 15px;
@@ -672,6 +644,7 @@ onBeforeUnmount(() => {
     cursor: pointer;
     border: none;
     transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
 }
 
 .btn-content {
@@ -682,29 +655,28 @@ onBeforeUnmount(() => {
     gap: 10px;
 }
 
-.download-icon,
-.qq-icon {
+.btn-icon {
     flex-shrink: 0;
 }
 
 .qr-badge-icon {
     flex-shrink: 0;
-    opacity: 0.85;
+    opacity: 0.8;
     transition: transform 0.28s ease, opacity 0.28s ease;
 }
 
-/* 主下载按钮 */
+/* 按钮 1：立即下载客户端（品牌流光主按钮） */
 .btn-download-main {
     overflow: hidden;
     background: linear-gradient(135deg, #2EDF04 0%, #1db954 100%);
-    color: #091405;
-    box-shadow: 0 8px 24px -4px rgba(46, 223, 4, 0.45),
+    color: #071304;
+    box-shadow: 0 6px 22px -4px rgba(46, 223, 4, 0.42),
                 inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-.btn-download-main:hover {
+.action:hover .btn-download-main {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px -4px rgba(46, 223, 4, 0.6),
+    box-shadow: 0 12px 28px -4px rgba(46, 223, 4, 0.58),
                 inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
@@ -714,9 +686,9 @@ onBeforeUnmount(() => {
     left: -100%;
     width: 60%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
     transform: skewX(-20deg);
-    animation: btnShimmer 3.8s infinite;
+    animation: btnShimmer 4s infinite;
 }
 
 @keyframes btnShimmer {
@@ -727,13 +699,13 @@ onBeforeUnmount(() => {
 .btn-version-tag {
     padding: 2px 8px;
     border-radius: 999px;
-    background: rgba(0, 0, 0, 0.16);
-    color: #071204;
+    background: rgba(0, 0, 0, 0.14);
+    color: #071304;
     font-size: 11.5px;
     font-weight: 700;
 }
 
-/* QQ 群玻璃拟态按钮 */
+/* 按钮 2：加入QQ群（精致毛玻璃次按钮） */
 .btn-qq-glass {
     background: var(--vp-c-bg-soft);
     color: var(--vp-c-text-1);
@@ -741,209 +713,37 @@ onBeforeUnmount(() => {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-.btn-qq-glass:hover {
-    border-color: var(--vp-c-brand-1);
+.action:hover .btn-qq-glass {
+    border-color: rgba(46, 223, 4, 0.5);
     background: var(--vp-c-bg-elv);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(46, 223, 4, 0.15);
+    box-shadow: 0 10px 26px -4px rgba(46, 223, 4, 0.18);
 }
 
-.btn:hover .qr-badge-icon {
+.action:hover .qr-badge-icon {
     opacity: 1;
     transform: scale(1.12);
 }
 
-/* =========================== 首页双渠道快捷下载面板 =========================== */
-.quick-channels {
-    max-width: 620px;
-    padding: 16px;
-    border-radius: 16px;
-    background: var(--vp-c-bg-soft);
-    border: 1px solid var(--vp-c-divider);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(12px);
-}
-
-.quick-channels-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    padding: 0 2px;
-}
-
-.quick-channels-title {
-    font-size: 12.5px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--vp-c-text-1);
-}
-
-.quick-channels-sub {
-    font-size: 12px;
-    color: var(--vp-c-text-2);
-}
-
-.quick-channels-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.channel-mini-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: var(--vp-c-bg);
-    border: 1px solid var(--vp-c-divider);
-    transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.channel-lanzou {
-    cursor: pointer;
-}
-
-.channel-lanzou:hover,
-.channel-git:hover {
-    border-color: rgba(46, 223, 4, 0.45);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.12);
-}
-
-.channel-mini-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: #fff;
-}
-
-.lanzou-gradient {
-    background: linear-gradient(135deg, #0ea5e9 0%, #2EDF04 100%);
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
-}
-
-.git-gradient {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-.channel-mini-body {
-    flex: 1;
-    min-width: 0;
-    text-align: left;
-}
-
-.channel-mini-top {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
-}
-
-.channel-mini-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--vp-c-text-1);
-    white-space: nowrap;
-}
-
-.channel-mini-badge {
-    padding: 1px 6px;
-    border-radius: 6px;
-    font-size: 10.5px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.badge-green {
-    background: rgba(46, 223, 4, 0.14);
-    color: #27b803;
-}
-
-.badge-blue {
-    background: rgba(99, 102, 241, 0.14);
-    color: #6366f1;
-}
-
-.channel-mini-desc {
-    display: block;
-    font-size: 12px;
-    color: var(--vp-c-text-2);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.channel-mini-arrow {
-    color: var(--vp-c-text-3);
-    transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.channel-lanzou:hover .channel-mini-arrow {
-    color: var(--vp-c-brand-1);
-    transform: translate(2px, -2px);
-}
-
-/* Git 快捷双按钮（GitHub / Gitee） */
-.git-mini-buttons {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 2px;
-}
-
-.git-pill-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 9px;
-    border-radius: 6px;
-    font-size: 11.5px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid var(--vp-c-divider);
-    background: var(--vp-c-bg-soft);
-    color: var(--vp-c-text-1);
-    transition: all 0.2s ease;
-}
-
-.github-pill:hover {
-    background: #24292f;
-    color: #fff;
-    border-color: #24292f;
-}
-
-.gitee-pill:hover {
-    background: #c71d23;
-    color: #fff;
-    border-color: #c71d23;
-}
-
-/* =========================== 悬浮二维码气泡卡片（自适应方向） =========================== */
-.qrcode-popover {
+/* =========================== 悬浮气泡公共定位系统（下载面板 & 二维码卡片共用） =========================== */
+.hero-popover {
     position: absolute;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.26s;
-    z-index: 200;
+    transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.24s;
+    z-index: 900;
 }
 
-.qrcode-popover.is-bottom {
+/* 1. 下方弹出 (is-bottom) */
+.hero-popover.is-bottom {
     top: calc(100% + 14px);
     left: 50%;
-    transform: translateX(-50%) translateY(10px) scale(0.94);
+    transform: translateX(-50%) translateY(10px) scale(0.95);
 }
-.qrcode-popover.is-bottom::before {
+.hero-popover.is-bottom::before {
     content: '';
     position: absolute;
     top: -16px;
@@ -951,14 +751,14 @@ onBeforeUnmount(() => {
     right: 0;
     height: 16px;
 }
-.btn:hover .qrcode-popover.is-bottom,
-.btn:focus-visible .qrcode-popover.is-bottom {
+.action:hover .hero-popover.is-bottom,
+.action:focus-within .hero-popover.is-bottom {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
     transform: translateX(-50%) translateY(0) scale(1);
 }
-.qrcode-popover.is-bottom .qrcode-popover-arrow {
+.hero-popover.is-bottom .hero-popover-arrow {
     top: -6px;
     left: 50%;
     border-top: 1px solid rgba(255, 255, 255, 0.16);
@@ -966,12 +766,13 @@ onBeforeUnmount(() => {
     transform: translateX(-50%) rotate(45deg);
 }
 
-.qrcode-popover.is-top {
+/* 2. 上方弹出 (is-top) */
+.hero-popover.is-top {
     bottom: calc(100% + 14px);
     left: 50%;
-    transform: translateX(-50%) translateY(-10px) scale(0.94);
+    transform: translateX(-50%) translateY(-10px) scale(0.95);
 }
-.qrcode-popover.is-top::before {
+.hero-popover.is-top::before {
     content: '';
     position: absolute;
     bottom: -16px;
@@ -979,14 +780,14 @@ onBeforeUnmount(() => {
     right: 0;
     height: 16px;
 }
-.btn:hover .qrcode-popover.is-top,
-.btn:focus-visible .qrcode-popover.is-top {
+.action:hover .hero-popover.is-top,
+.action:focus-within .hero-popover.is-top {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
     transform: translateX(-50%) translateY(0) scale(1);
 }
-.qrcode-popover.is-top .qrcode-popover-arrow {
+.hero-popover.is-top .hero-popover-arrow {
     bottom: -6px;
     left: 50%;
     border-bottom: 1px solid rgba(255, 255, 255, 0.16);
@@ -994,12 +795,13 @@ onBeforeUnmount(() => {
     transform: translateX(-50%) rotate(45deg);
 }
 
-.qrcode-popover.is-right {
+/* 3. 右侧弹出 (is-right) */
+.hero-popover.is-right {
     left: calc(100% + 16px);
     top: 50%;
-    transform: translateX(10px) translateY(calc(-50% + var(--popover-shift-y, 0px))) scale(0.94);
+    transform: translateX(10px) translateY(calc(-50% + var(--popover-shift-y, 0px))) scale(0.95);
 }
-.qrcode-popover.is-right::before {
+.hero-popover.is-right::before {
     content: '';
     position: absolute;
     left: -18px;
@@ -1007,14 +809,14 @@ onBeforeUnmount(() => {
     bottom: 0;
     width: 18px;
 }
-.btn:hover .qrcode-popover.is-right,
-.btn:focus-visible .qrcode-popover.is-right {
+.action:hover .hero-popover.is-right,
+.action:focus-within .hero-popover.is-right {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
     transform: translateX(0) translateY(calc(-50% + var(--popover-shift-y, 0px))) scale(1);
 }
-.qrcode-popover.is-right .qrcode-popover-arrow {
+.hero-popover.is-right .hero-popover-arrow {
     left: -6px;
     top: calc(50% - var(--popover-shift-y, 0px));
     border-bottom: 1px solid rgba(255, 255, 255, 0.16);
@@ -1022,7 +824,7 @@ onBeforeUnmount(() => {
     transform: translateY(-50%) rotate(45deg);
 }
 
-.qrcode-popover-arrow {
+.hero-popover-arrow {
     position: absolute;
     width: 12px;
     height: 12px;
@@ -1030,6 +832,234 @@ onBeforeUnmount(() => {
     z-index: 1;
 }
 
+/* =========================== 悬浮卡片 1：双渠道下载悬浮面板 =========================== */
+.dl-popover-card {
+    position: relative;
+    width: 320px;
+    padding: 14px;
+    background: #18181b;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 22px 54px rgba(0, 0, 0, 0.55),
+                0 0 28px rgba(46, 223, 4, 0.2);
+    text-align: left;
+    color: #f4f4f5;
+}
+
+.dl-pop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dl-pop-header-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.dl-pop-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2EDF04;
+    box-shadow: 0 0 8px #2EDF04;
+}
+
+.dl-pop-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.3px;
+}
+
+.dl-pop-ver {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(46, 223, 4, 0.15);
+    color: #4ade80;
+}
+
+/* 渠道一：蓝奏云项 */
+.dl-pop-channel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 10px;
+}
+
+.dl-pop-channel:hover {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: rgba(46, 223, 4, 0.5);
+    transform: translateY(-1px);
+}
+
+.dl-pop-channel-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.dl-pop-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.lanzou-gradient {
+    background: linear-gradient(135deg, #0ea5e9 0%, #2EDF04 100%);
+}
+
+.git-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.dl-pop-info {
+    min-width: 0;
+}
+
+.dl-pop-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+.dl-pop-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.dl-pop-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 5px;
+}
+
+.badge-emerald {
+    background: rgba(46, 223, 4, 0.18);
+    color: #4ade80;
+}
+
+.dl-pop-desc {
+    display: block;
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.62);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dl-pop-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(46, 223, 4, 0.16);
+    color: #4ade80;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.dl-pop-channel:hover .dl-pop-go {
+    background: #2EDF04;
+    color: #061303;
+}
+
+/* 渠道二：Git 双源块 */
+.dl-pop-git-block {
+    padding: 11px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dl-pop-git-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9px;
+}
+
+.dl-pop-git-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.dl-pop-git-sub {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.48);
+}
+
+.dl-pop-git-btns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.dl-pop-git-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+.dl-pop-git-btn.is-github {
+    background: #24292f;
+}
+
+.dl-pop-git-btn.is-github:hover {
+    background: #363d45;
+    border-color: #6366f1;
+    transform: translateY(-1px);
+}
+
+.dl-pop-git-btn.is-gitee {
+    background: #b91c1c;
+}
+
+.dl-pop-git-btn.is-gitee:hover {
+    background: #dc2626;
+    border-color: #f87171;
+    transform: translateY(-1px);
+}
+
+/* =========================== 悬浮卡片 2：QQ 群二维码卡片 =========================== */
 .qrcode-card {
     position: relative;
     width: 236px;
@@ -1037,7 +1067,7 @@ onBeforeUnmount(() => {
     background: #18181b;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
+    box-shadow: 0 22px 54px rgba(0, 0, 0, 0.55),
                 0 0 28px rgba(46, 223, 4, 0.22);
     overflow: hidden;
 }
@@ -1100,7 +1130,7 @@ onBeforeUnmount(() => {
 .qc-modal-panel {
     position: relative;
     width: 100%;
-    max-width: 680px;
+    max-width: 660px;
     border-radius: 22px;
     background: var(--vp-c-bg-elv, #161618);
     border: 1px solid var(--vp-c-divider);
@@ -1286,7 +1316,6 @@ onBeforeUnmount(() => {
     line-height: 1.5;
 }
 
-/* 蓝奏云操作栏 */
 .dl-lanzou-actions {
     display: flex;
     align-items: center;
@@ -1306,11 +1335,6 @@ onBeforeUnmount(() => {
     border: 1px solid var(--vp-c-divider);
     font-size: 12.5px;
     cursor: pointer;
-    transition: border-color 0.2s ease;
-}
-
-.dl-pwd-box:hover {
-    border-color: #0ea5e9;
 }
 
 .dl-pwd-free {
@@ -1366,7 +1390,6 @@ onBeforeUnmount(() => {
     box-shadow: 0 10px 24px -4px rgba(46, 223, 4, 0.55);
 }
 
-/* Git 双子渠道网格：GitHub & Gitee */
 .dl-git-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1388,12 +1411,10 @@ onBeforeUnmount(() => {
 
 .subcard-github:hover {
     border-color: #6366f1;
-    box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.2);
 }
 
 .subcard-gitee:hover {
     border-color: #c71d23;
-    box-shadow: 0 8px 20px -6px rgba(199, 29, 35, 0.2);
 }
 
 .dl-git-subcard-top {
@@ -1482,7 +1503,6 @@ onBeforeUnmount(() => {
     transform: translateY(-1px);
 }
 
-/* 弹窗底部 */
 .qc-modal-footer {
     display: flex;
     align-items: center;
@@ -1509,7 +1529,6 @@ onBeforeUnmount(() => {
     text-decoration: underline;
 }
 
-/* 轻提示 Toast */
 .qc-toast {
     position: absolute;
     bottom: 18px;
@@ -1543,7 +1562,6 @@ onBeforeUnmount(() => {
     box-shadow: 0 0 8px #2EDF04;
 }
 
-/* 弹窗过渡动画 */
 .qc-modal-fade-enter-active,
 .qc-modal-fade-leave-active {
     transition: opacity 0.24s ease;
@@ -1583,7 +1601,7 @@ onBeforeUnmount(() => {
 
     .main {
         text-align: left;
-        max-width: 620px;
+        max-width: 600px;
         order: 1;
     }
 
@@ -1603,7 +1621,6 @@ onBeforeUnmount(() => {
         font-size: 2.1rem;
     }
 
-    .quick-channels-grid,
     .dl-git-grid {
         grid-template-columns: 1fr;
     }
@@ -1630,6 +1647,7 @@ onBeforeUnmount(() => {
     }
 
     .btn {
+        width: 100%;
         justify-content: center;
     }
 }
